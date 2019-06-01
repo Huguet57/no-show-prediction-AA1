@@ -63,12 +63,15 @@ for (k in 1:nrow(barris)) {
 
 dd[sample(1:nrow(dd), size = 10),]
 
+hist(dd$SchedMonth)
+hist(dd$AppointMonth)
+
 write.csv(barris,
           file = "./preprocessing/barri_info/barris_info.csv",
           fileEncoding = "UTF-8",
           row.names = FALSE)
 
 write.csv(dd,
-          file = "./preprocessing/neighs_update.csv",
+          file = "./preprocessing/data_with_neighs.csv",
           fileEncoding = "UTF-8",
           row.names = FALSE)

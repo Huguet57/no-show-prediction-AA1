@@ -25,7 +25,7 @@ getHM <- function(date) {
 dateDiff <- function(dd) {
   days <- (dd$AppointDay - dd$SchedDay)
   month <- (dd$AppointMonth - dd$SchedMonth)*30
-  year <- (dd$AppointYear - dd$SchedYear)*365
+  # year <- (dd$AppointYear - dd$SchedYear)*365
 
-  days + month + year
+  days + month # + year
 }
