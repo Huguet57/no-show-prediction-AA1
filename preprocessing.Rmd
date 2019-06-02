@@ -210,6 +210,8 @@ for (i in 1:length(IDs)) {
     print(i/length(IDs) * 100)
   }
 }
+
+summary(dd)
 ```
 
 ```{r}
@@ -237,6 +239,10 @@ for (i.days in 1:length(Days)) {
 }
 
 summary(dd)
+
+dd$Prop.Noshows <- NULL
+dd$Hist.Noshows <- NULL
+dd$Hist.Scheds <- NULL
 
 write.csv(dd,
           file = paste(DIR, 'data_with_neighs_same_day.csv', sep = "/"),
