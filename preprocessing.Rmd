@@ -1,0 +1,245 @@
+---
+title: "Pre-processing"
+author: "David Anglada Rotger and Andreu Huguet Segarra"
+date: "4/30/2019"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+## 1. Data load and variables
+
+We will begin with loading the complete dataset "Medical Appointment No Shows" from the Kaggle website. That collects information about which patients show up or don't show up when making an appointment.
+
+```{r}
+# DIR <- 'W://AA1/'
+DIR <- 'C:\\Users\\andreu.huguet\\Downloads\\no-show-prediction-AA1-master\\'
+setwd(DIR)
+dd <- read.csv(paste(DIR, "hospital.csv", sep=""),
+               fileEncoding = 'UTF-8')
+```
+
+```{r}
+if(!exists("foo", mode="function")) source("functions.R")
+colnames(dd)
+head(dd)
+```
+
+# 1.1. Variable transformation and relabeling
+
+# 1.1.1. Factoritzation of the binary variables
+
+As we see from the data columns, there are 14 variables, mainly categorical ones. With exception of continuous variables $\texttt{Age}$ and $\texttt{SMS_received}$. Since $R$ detects the binary $0$, $1$ as an integer we will first try to factorize those variables.
+
+```{r}
+dd$PatientId <- factor(dd$PatientId, levels = unique(dd$PatientId))
+dd$Gender <- factor(dd$Gender, levels = unique(dd$Gender))
+
+dd$No.show <- factor(dd$No.show,
+                         levels = unique(dd$No.show),
+                         labels = c("Show", "NoShow"))
+
+dd$Scholarship <- factor(dd$Scholarship,
+                         levels = unique(dd$Scholarship),
+                         labels = c("No", "Yes"))
+
+dd$Hipertension <- factor(dd$Hipertension,
+                          levels = unique(dd$Hipertension),
+                          labels = c("Yes", "No"))
+
+dd$Diabetes <- factor(dd$Diabetes,
+                      levels = unique(dd$Diabetes),
+                      labels = c("No", "Yes"))
+
+dd$Alcoholism <- factor(dd$Alcoholism,
+                        levels = unique(dd$Alcoholism),
+                        labels = c("No", "Yes"))
+
+dd$Handcap <- factor(dd$Handcap,
+                     levels = unique(dd$Handcap),
+                     labels = c("None", "Low", "Mid", "High", "VHigh"))
+
+dd$SMS_received <- factor(dd$SMS_received,
+                          levels = unique(dd$SMS_received),
+                          labels = c("No", "Yes"))
+```
+
+# 1.1.3. Date transformation
+
+Another big problem we see is the treatment of the dates of appointment because the format hard to interpret. This calls for a transformation of the variables and opens a window for the creation of new variables containing interesting relations with the dates.
+
+```{r}
+DYM <- getDYM(dd$ScheduledDay)
+
+dd$SchedDay <- as.numeric(DYM$day)
+dd$SchedMonth <- as.numeric(DYM$month)
+# dd$SchedYear <- as.numeric(DYM$year)
+
+HM <- getHM(dd$ScheduledDay)
+
+dd$SchedHour <- as.numeric(HM$hour)
+dd$SchedMinute <- as.numeric(HM$minute)
+```
+
+And we can do the same to the variable $\texttt{AppointmentDay}$.
+
+```{r}
+DYM <- getDYM(dd$AppointmentDay)
+
+dd$AppointDay <- as.numeric(DYM$day)
+dd$AppointMonth <- as.numeric(DYM$month)
+# dd$AppointYear <- as.numeric(DYM$year)
+```
+
+Since the old variables are of no use no more, we can choose to erase them.
+
+```{r}
+dd$ScheduledDay <- NULL
+dd$AppointmentDay <- NULL
+```
+
+We can also create an interesting, although natural, variable consisting of the difference of days between the scheduled date and the appointment date.
+
+```{r}
+dd$DateDiff <- dateDiff(dd)
+```
+
+# 1.2 Anomaly detection
+
+We now want to erase or fix any possible anomaly that can cause erronious predictions. We first will assume that the variables $\texttt{Gender}$, $\texttt{Neighbourhoood}$, $\texttt{Scholarship}$, $\texttt{Hipertension}$, $\texttt{Diabetes}$, $\texttt{Alcoholism}$, $\texttt{Handcap}$, $\texttt{SMS_received}$, $\texttt{No.show}$ do not contain any anomaly since they are of type factor and we have checked that the $\texttt{unique}$ vector is the same as the levels we would want to have.
+
+# 1.2.1 Missing values
+
+To begin with, we will check if there are any missing values in the dataset. First, we look at the $\texttt{Age}$ variable. We see that there is a patient that is -1 years old. We proceed to remove that instance.
+
+```{r}
+range(unique(dd$Age))
+dd <- dd[-which(dd$Age == -1),]
+```
+
+In the documentation of the data set it is clear that the appointment date is always after the scheduled date but we see a minimum value of $-6$ in DateDiff. Let's check these anomalies.
+
+```{r}
+dd[which(dd$DateDiff < 0),]
+```
+
+Other than two of these five patients being of Handcap level 1, these are pretty standard patients all having fled their appointment in the month of May 2016... Maybe these no shows have been caused by the problem of the switched date. We choose to erase these instances since they are not representative of the general behaviour of the patients.
+
+```{r}
+dd <- dd[-which(dd$DateDiff < 0),]
+```
+
+# 1.3 Deletion of irrelevant variables
+
+We now might want to see if there are variables that don't add any additional information and disturb the interpretability of the model proposed. We will begin with the two $\texttt{ID}$ variables.
+
+Firstly, we would want to know if patients come back to the hospital. That is, that there are multiple visits of patients.
+
+```{r}
+barplot(table(dd$PatientId), names.arg = "Patient IDs")
+```
+
+Definitely! There are patients that come back very regulary. So this might bring us important and personalized predictions of the patients.
+
+Unsurprisingly, the appointment ID will be unique. But we would like to know if its related to the date of appointment or schedule.
+
+```{r}
+# DateStamp = Days + Months*30 + Years*365
+SchedStamp <- dd$SchedDay + dd$SchedMonth*30 # + dd$SchedYear*365
+DateStamp <- dd$AppointDay + dd$AppointMonth*30 # + dd$AppointYear*365
+
+appID <- as.numeric(dd$AppointmentID)
+
+plot(appID, DateStamp)
+plot(appID, SchedStamp)
+```
+
+We suspect that it is the case. We will calculate the $R^2$ of the relation $\texttt{AppointmentID}$ and $\texttt{SchedStamp}$.
+
+```{r}
+mod <- glm(appID ~ SchedStamp)
+Rsquared <- 1 - mod$deviance/mod$null.deviance
+summary(mod)
+Rsquared
+```
+
+The $R^2$ show that there is a very strong correlation between the two variables. Therefore, we will erase the $\texttt{AppointmentID}$ variable for simplicity.
+
+```{r}
+dd$AppointmentID <- NULL
+summary(dd)
+
+# Export processed data to file 
+write.csv(dd,
+          file = paste(DIR, 'data.csv', sep = "/"),
+          fileEncoding = "UTF-8",
+          row.names = FALSE)
+```
+
+# Anàlisi després de l'enquesta
+
+```{r}
+dd2 <- dd
+dd2$Neighbourhood <- NULL
+dd2$DateDiff <- NULL
+
+summary(dd2$Handcap)
+
+dd2$HandcapBin <- rep(NA, nrow(dd2))
+dd2[which(dd2$Handcap == "None"),]$HandcapBin <- 0
+dd2[which(dd2$Handcap != "None"),]$HandcapBin <- 1
+dd2$Handcap <- NULL
+```
+
+```{r}
+IDs <- unique(dd$PatientId)
+dd$Prop.Noshows <- rep(NA, nrow(dd))
+dd$Hist.Noshows <- rep(NA, nrow(dd))
+dd$Hist.Scheds <- rep(NA, nrow(dd))
+
+for (i in 1:length(IDs)) {
+  people.with.id <- which(dd$PatientId == IDs[i])
+  N.noshows <- sum(dd[people.with.id,]$No.show == "NoShow")
+  N.scheds <- nrow(dd[people.with.id,])
+  
+  dd[people.with.id,]$Prop.Noshows <- N.noshows/N.scheds
+  dd[people.with.id,]$Hist.Noshows <- N.noshows
+  dd[people.with.id,]$Hist.Scheds <- N.scheds
+  
+  if (i%%300 == 0) {
+    print(i/length(IDs) * 100)
+  }
+}
+```
+
+```{r}
+Days <- unique(dd$AppointDay)
+Months <- unique(dd$AppointMonth)
+Locations <- unique(dd$Neighbourhood)
+
+dd$People.same.day <- rep(NA, nrow(dd))
+
+for (i.days in 1:length(Days)) {
+  for (i.months in 1:length(Months)) {
+    for (i.locations in 1:length(Locations)) {
+      people.same.day <- which(dd$AppointDay == Days[i.days] &
+                               dd$AppointMonth == Months[i.months] &
+                               dd$Neighbourhood == Locations[i.locations])
+      
+      if (length(people.same.day) > 0) {
+        dd[people.same.day,]$People.same.day <- length(people.same.day)
+      }
+      
+      # AppointmentID?
+    }
+  }
+  print(i.days/length(Days) * 100)
+}
+
+summary(dd)
+
+write.csv(dd,
+          file = paste(DIR, 'data_with_neighs_same_day.csv', sep = "/"),
+          fileEncoding = "UTF-8",
+          row.names = FALSE)
+```
