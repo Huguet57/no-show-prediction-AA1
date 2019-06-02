@@ -175,3 +175,82 @@ write.csv(dd,
           fileEncoding = "UTF-8",
           row.names = FALSE)
 ```
+
+# Anàlisi després de l'enquesta
+
+```{r}
+dd2 <- dd
+dd2$Neighbourhood <- NULL
+dd2$DateDiff <- NULL
+
+summary(dd2$Handcap)
+
+dd2$HandcapBin <- rep(NA, nrow(dd2))
+dd2[which(dd2$Handcap == "None"),]$HandcapBin <- 0
+dd2[which(dd2$Handcap != "None"),]$HandcapBin <- 1
+dd2$Handcap <- NULL
+
+mod <- glm(No.show ~ .,
+            data = dd2,
+            family = "binomial")
+
+summary(mod)
+
+pred.mod <- predict(mod, type = "response")
+conf <- table(pred.mod > 0.5, dd2$No.show)
+sum(diag(conf))/sum(conf)
+```
+
+```{r}
+IDs <- unique(dd$PatientId)
+dd$Prop.Noshows <- rep(NA, nrow(dd))
+dd$Hist.Noshows <- rep(NA, nrow(dd))
+dd$Hist.Scheds <- rep(NA, nrow(dd))
+
+for (i in 1:length(IDs)) {
+  people.with.id <- which(dd$PatientId == IDs[i])
+  N.noshows <- sum(dd[people.with.id,]$No.show == "NoShow")
+  N.scheds <- nrow(dd[people.with.id,])
+  
+  dd[people.with.id,]$Prop.Noshows <- N.noshows/N.scheds
+  dd[people.with.id,]$Hist.Noshows <- N.noshows
+  dd[people.with.id,]$Hist.Scheds <- N.scheds
+  
+  # if (i%%300 == 0) {
+  #   print(i/length(IDs) * 100)
+  # }
+}
+```
+
+```{r}
+Days <- unique(dd$AppointDay)
+Months <- unique(dd$AppointMonth)
+Locations <- unique(dd$Neighbourhood)
+
+for (i.days in 1:length(Days)) {
+  for (i.months in 1:length(Months)) {
+    for (i.locations in 1:length(Locations)) {
+      people.same.day <- which(dd$AppointDay == Days[i.days] &
+                               dd$AppointMonth == Months[i.months] &
+                               dd$Neighbourhood == Locations[i.locations])
+      
+      length(people.same.day)
+      # AppointmentID?
+    }
+  }
+}
+
+dd$Prop.Noshows <- rep(NA, nrow(dd))
+
+for (i in 1:length(IDs)) {
+  people.with.id <- which(dd$PatientId == IDs[i])
+  N.noshows <- sum(dd[people.with.id,]$No.show == "NoShow")
+  N.scheds <- nrow(dd[people.with.id,])
+  dd[people.with.id,]$Prop.Noshows <- N.noshows/N.scheds
+  
+  if (i%%300 == 0) {
+    print(i/nrow(dd) * 100)
+  }
+  
+}
+```
