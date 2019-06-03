@@ -13,11 +13,10 @@ source("./fun/functions.r")
 source("./norm/factorize.r")
 
 # 2.2. Date normalitzation
-source("./norm/datetransf.r")
+source("./norm/datenorm.r")
 
 # 3. Anomaly detection
 # 3.1 Removal of missing values
-range(unique(dd$Age))
 dd <- dd[-which(dd$Age == -1),]
 dd <- dd[-which(dd$DateDiff < 0),]
 
