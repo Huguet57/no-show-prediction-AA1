@@ -12,7 +12,7 @@ library(base)
 
 # Obtenim els noms dels PDF per canviar-los a CSV
 
-barris.names <- list.files("../barris_pdf")
+barris.names <- list.files("./barris_pdf")
 
 for (i in c(1:80)) {
   name.length <- nchar(barris.names[i])
@@ -22,14 +22,14 @@ for (i in c(1:80)) {
 barris.names
 
 for (i in c(50:80)) {
-  csv.name <- paste("../barris_csv/", paste(barris.names[i], ".csv", sep = ""), sep = "")
-  pdf.name <- paste("../barris_pdf/", paste(barris.names[i], ".pdf", sep = ""), sep = "")
+  csv.name <- paste("./barris_csv/", paste(barris.names[i], ".csv", sep = ""), sep = "")
+  pdf.name <- paste("./barris_pdf/", paste(barris.names[i], ".pdf", sep = ""), sep = "")
   # convert_pdf(pdf.name, csv.name, api_key = "31r4vr79w4vb")
 }
 
 # Ara mirem els .csv per trobar la taula de dades socio-econòmiques
 
-barris.csv <- list.files("../barris_csv")
+barris.csv <- list.files("./barris_csv")
 
 for (i in c(1:2)) {
   name.length <- nchar(barris.csv[i])
@@ -56,7 +56,7 @@ for (i in c(1:80)) {
     
   } else {
     
-    csv.name <- paste("../barris_csv/", paste(barris.names[i], ".csv", sep = ""), sep = "")
+    csv.name <- paste("./barris_csv/", paste(barris.names[i], ".csv", sep = ""), sep = "")
     whole.map <- read.csv(csv.name, stringsAsFactors = FALSE, dec=",")
     colnames(whole.map) <- paste("X", 1:ncol(whole.map), sep = ".")
     # print(nrow(whole.map)) # de 89 està entre 75 i 81
@@ -153,5 +153,5 @@ hist(barri.frame[,6])
 barri.frame <- data.frame(barri.frame, Density = barri.frame[,3]/barri.frame[,2])
 
 write.csv(barri.frame,
-          file = paste("../barris_info.csv"),
+          file = paste("./barris_info.csv"),
           fileEncoding = "UTF-8")
