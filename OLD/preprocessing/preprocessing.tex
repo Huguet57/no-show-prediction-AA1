@@ -1,0 +1,845 @@
+\documentclass[]{article}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\usepackage{ifxetex,ifluatex}
+\usepackage{fixltx2e} % provides \textsubscript
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+\else % if luatex or xelatex
+  \ifxetex
+    \usepackage{mathspec}
+  \else
+    \usepackage{fontspec}
+  \fi
+  \defaultfontfeatures{Ligatures=TeX,Scale=MatchLowercase}
+\fi
+% use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+% use microtype if available
+\IfFileExists{microtype.sty}{%
+\usepackage{microtype}
+\UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\usepackage[margin=1in]{geometry}
+\usepackage{hyperref}
+\hypersetup{unicode=true,
+            pdftitle={Pre-processing},
+            pdfauthor={David Anglada Rotger and Andreu Huguet Segarra},
+            pdfborder={0 0 0},
+            breaklinks=true}
+\urlstyle{same}  % don't use monospace font for urls
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.77,0.63,0.00}{#1}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\usepackage{graphicx,grffile}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+\IfFileExists{parskip.sty}{%
+\usepackage{parskip}
+}{% else
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt plus 2pt minus 1pt}
+}
+\setlength{\emergencystretch}{3em}  % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{0}
+% Redefines (sub)paragraphs to behave more like sections
+\ifx\paragraph\undefined\else
+\let\oldparagraph\paragraph
+\renewcommand{\paragraph}[1]{\oldparagraph{#1}\mbox{}}
+\fi
+\ifx\subparagraph\undefined\else
+\let\oldsubparagraph\subparagraph
+\renewcommand{\subparagraph}[1]{\oldsubparagraph{#1}\mbox{}}
+\fi
+
+%%% Use protect on footnotes to avoid problems with footnotes in titles
+\let\rmarkdownfootnote\footnote%
+\def\footnote{\protect\rmarkdownfootnote}
+
+%%% Change title format to be more compact
+\usepackage{titling}
+
+% Create subtitle command for use in maketitle
+\newcommand{\subtitle}[1]{
+  \posttitle{
+    \begin{center}\large#1\end{center}
+    }
+}
+
+\setlength{\droptitle}{-2em}
+
+  \title{Pre-processing}
+    \pretitle{\vspace{\droptitle}\centering\huge}
+  \posttitle{\par}
+    \author{David Anglada Rotger and Andreu Huguet Segarra}
+    \preauthor{\centering\large\emph}
+  \postauthor{\par}
+      \predate{\centering\large\emph}
+  \postdate{\par}
+    \date{4/30/2019}
+
+
+\begin{document}
+\maketitle
+
+\subsection{1. Data load and variables}\label{data-load-and-variables}
+
+We will begin with loading the complete dataset ``Medical Appointment No
+Shows'' from the Kaggle website. That collects information about which
+patients show up or don't show up when making an appointment.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{setwd}\NormalTok{(}\StringTok{'W://AA1/'}\NormalTok{)}
+\NormalTok{dd <-}\StringTok{ }\KeywordTok{read.csv}\NormalTok{(}\StringTok{"./hospital.csv"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\ControlFlowTok{if}\NormalTok{(}\OperatorTok{!}\KeywordTok{exists}\NormalTok{(}\StringTok{"foo"}\NormalTok{, }\DataTypeTok{mode=}\StringTok{"function"}\NormalTok{)) }\KeywordTok{source}\NormalTok{(}\StringTok{"functions.R"}\NormalTok{)}
+\KeywordTok{colnames}\NormalTok{(dd)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##  [1] "PatientId"      "AppointmentID"  "Gender"         "ScheduledDay"  
+##  [5] "AppointmentDay" "Age"            "Neighbourhood"  "Scholarship"   
+##  [9] "Hipertension"   "Diabetes"       "Alcoholism"     "Handcap"       
+## [13] "SMS_received"   "No.show"
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{head}\NormalTok{(dd)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##      PatientId AppointmentID Gender         ScheduledDay
+## 1 2.987250e+13       5642903      F 2016-04-29T18:38:08Z
+## 2 5.589978e+14       5642503      M 2016-04-29T16:08:27Z
+## 3 4.262962e+12       5642549      F 2016-04-29T16:19:04Z
+## 4 8.679512e+11       5642828      F 2016-04-29T17:29:31Z
+## 5 8.841186e+12       5642494      F 2016-04-29T16:07:23Z
+## 6 9.598513e+13       5626772      F 2016-04-27T08:36:51Z
+##         AppointmentDay Age     Neighbourhood Scholarship Hipertension
+## 1 2016-04-29T00:00:00Z  62   JARDIM DA PENHA           0            1
+## 2 2016-04-29T00:00:00Z  56   JARDIM DA PENHA           0            0
+## 3 2016-04-29T00:00:00Z  62     MATA DA PRAIA           0            0
+## 4 2016-04-29T00:00:00Z   8 PONTAL DE CAMBURI           0            0
+## 5 2016-04-29T00:00:00Z  56   JARDIM DA PENHA           0            1
+## 6 2016-04-29T00:00:00Z  76        REPÃšBLICA           0            1
+##   Diabetes Alcoholism Handcap SMS_received No.show
+## 1        0          0       0            0      No
+## 2        0          0       0            0      No
+## 3        0          0       0            0      No
+## 4        0          0       0            0      No
+## 5        1          0       0            0      No
+## 6        0          0       0            0      No
+\end{verbatim}
+
+\section{1.1. Variable transformation and
+relabeling}\label{variable-transformation-and-relabeling}
+
+\section{1.1.1. Factoritzation of the binary
+variables}\label{factoritzation-of-the-binary-variables}
+
+As we see from the data columns, there are 14 variables, mainly
+categorical ones. With exception of continuous variables
+\(\texttt{Age}\) and \(\texttt{SMS_received}\). Since \(R\) detects the
+binary \(0\), \(1\) as an integer we will first try to factorize those
+variables.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{dd}\OperatorTok{$}\NormalTok{PatientId <-}\StringTok{ }\KeywordTok{factor}\NormalTok{(dd}\OperatorTok{$}\NormalTok{PatientId, }\DataTypeTok{levels =} \KeywordTok{unique}\NormalTok{(dd}\OperatorTok{$}\NormalTok{PatientId))}
+
+\NormalTok{dd}\OperatorTok{$}\NormalTok{Gender <-}\StringTok{ }\KeywordTok{factor}\NormalTok{(dd}\OperatorTok{$}\NormalTok{Gender, }\DataTypeTok{levels =} \KeywordTok{unique}\NormalTok{(dd}\OperatorTok{$}\NormalTok{Gender))}
+\NormalTok{dd}\OperatorTok{$}\NormalTok{Scholarship <-}\StringTok{ }\KeywordTok{factor}\NormalTok{(dd}\OperatorTok{$}\NormalTok{Scholarship, }\DataTypeTok{levels =} \KeywordTok{unique}\NormalTok{(dd}\OperatorTok{$}\NormalTok{Scholarship))}
+
+\NormalTok{dd}\OperatorTok{$}\NormalTok{Hipertension <-}\StringTok{ }\KeywordTok{factor}\NormalTok{(dd}\OperatorTok{$}\NormalTok{Hipertension, }\DataTypeTok{levels =} \KeywordTok{unique}\NormalTok{(dd}\OperatorTok{$}\NormalTok{Hipertension))}
+\NormalTok{dd}\OperatorTok{$}\NormalTok{Diabetes <-}\StringTok{ }\KeywordTok{factor}\NormalTok{(dd}\OperatorTok{$}\NormalTok{Diabetes, }\DataTypeTok{levels =} \KeywordTok{unique}\NormalTok{(dd}\OperatorTok{$}\NormalTok{Diabetes))}
+\NormalTok{dd}\OperatorTok{$}\NormalTok{Alcoholism <-}\StringTok{ }\KeywordTok{factor}\NormalTok{(dd}\OperatorTok{$}\NormalTok{Alcoholism, }\DataTypeTok{levels =} \KeywordTok{unique}\NormalTok{(dd}\OperatorTok{$}\NormalTok{Alcoholism))}
+
+\NormalTok{dd}\OperatorTok{$}\NormalTok{Handcap <-}\StringTok{ }\KeywordTok{factor}\NormalTok{(dd}\OperatorTok{$}\NormalTok{Handcap, }\DataTypeTok{levels =} \KeywordTok{unique}\NormalTok{(dd}\OperatorTok{$}\NormalTok{Handcap))}
+\NormalTok{dd}\OperatorTok{$}\NormalTok{SMS_received <-}\StringTok{ }\KeywordTok{factor}\NormalTok{(dd}\OperatorTok{$}\NormalTok{SMS_received, }\DataTypeTok{levels =} \KeywordTok{unique}\NormalTok{(dd}\OperatorTok{$}\NormalTok{SMS_received))}
+
+\KeywordTok{summary}\NormalTok{(dd)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##            PatientId      AppointmentID     Gender   
+##  822145925426128:    88   Min.   :5030230   F:71840  
+##  99637671331    :    84   1st Qu.:5640286   M:38687  
+##  26886125921145 :    70   Median :5680573            
+##  33534783483176 :    65   Mean   :5675305            
+##  258424392677   :    62   3rd Qu.:5725524            
+##  871374938638855:    62   Max.   :5790484            
+##  (Other)        :110096                              
+##                ScheduledDay                 AppointmentDay 
+##  2016-05-06T07:09:54Z:    24   2016-06-06T00:00:00Z: 4692  
+##  2016-05-06T07:09:53Z:    23   2016-05-16T00:00:00Z: 4613  
+##  2016-04-25T17:17:46Z:    22   2016-05-09T00:00:00Z: 4520  
+##  2016-04-25T17:18:27Z:    22   2016-05-30T00:00:00Z: 4514  
+##  2016-04-25T17:17:23Z:    19   2016-06-08T00:00:00Z: 4479  
+##  2016-04-25T17:19:03Z:    15   2016-05-11T00:00:00Z: 4474  
+##  (Other)             :110402   (Other)             :83235  
+##       Age                 Neighbourhood   Scholarship Hipertension
+##  Min.   : -1.00   JARDIM CAMBURI : 7717   0:99666     1:21801     
+##  1st Qu.: 18.00   MARIA ORTIZ    : 5805   1:10861     0:88726     
+##  Median : 37.00   RESISTÃŠNCIA   : 4431                           
+##  Mean   : 37.09   JARDIM DA PENHA: 3877                           
+##  3rd Qu.: 55.00   ITARARÃ‰       : 3514                           
+##  Max.   :115.00   CENTRO         : 3334                           
+##                   (Other)        :81849                           
+##  Diabetes   Alcoholism Handcap    SMS_received No.show    
+##  0:102584   0:107167   0:108286   0:75045      No :88208  
+##  1:  7943   1:  3360   1:  2042   1:35482      Yes:22319  
+##                        2:   183                           
+##                        3:    13                           
+##                        4:     3                           
+##                                                           
+## 
+\end{verbatim}
+
+\section{1.1.2. Neighbourhood encoding}\label{neighbourhood-encoding}
+
+We also might think of encoding the neighbourhoods with shorter, but
+still recognizable, labels.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{neighbourhoods <-}\StringTok{ }\KeywordTok{levels}\NormalTok{(dd}\OperatorTok{$}\NormalTok{Neighbourhood)}
+\NormalTok{short.neighbourhoods <-}\StringTok{ }\KeywordTok{encodeNeighbourhood}\NormalTok{(neighbourhoods)}
+\CommentTok{# Remove last element (which is blank)}
+\NormalTok{short.neighbourhoods <-}\StringTok{ }\NormalTok{short.neighbourhoods[}\OperatorTok{-}\KeywordTok{length}\NormalTok{(short.neighbourhoods)]}
+\end{Highlighting}
+\end{Shaded}
+
+The encoding has been successful since there are still 81 unique values.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{length}\NormalTok{(}\KeywordTok{unique}\NormalTok{(short.neighbourhoods))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 81
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{length}\NormalTok{(neighbourhoods)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 81
+\end{verbatim}
+
+So we can apply the encoding.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{dd}\OperatorTok{$}\NormalTok{Neighbourhood <-}\StringTok{ }\KeywordTok{factor}\NormalTok{(dd}\OperatorTok{$}\NormalTok{Neighbourhood, }\DataTypeTok{labels =}\NormalTok{ short.neighbourhoods)}
+\KeywordTok{summary}\NormalTok{(dd)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##            PatientId      AppointmentID     Gender   
+##  822145925426128:    88   Min.   :5030230   F:71840  
+##  99637671331    :    84   1st Qu.:5640286   M:38687  
+##  26886125921145 :    70   Median :5680573            
+##  33534783483176 :    65   Mean   :5675305            
+##  258424392677   :    62   3rd Qu.:5725524            
+##  871374938638855:    62   Max.   :5790484            
+##  (Other)        :110096                              
+##                ScheduledDay                 AppointmentDay 
+##  2016-05-06T07:09:54Z:    24   2016-06-06T00:00:00Z: 4692  
+##  2016-05-06T07:09:53Z:    23   2016-05-16T00:00:00Z: 4613  
+##  2016-04-25T17:17:46Z:    22   2016-05-09T00:00:00Z: 4520  
+##  2016-04-25T17:18:27Z:    22   2016-05-30T00:00:00Z: 4514  
+##  2016-04-25T17:17:23Z:    19   2016-06-08T00:00:00Z: 4479  
+##  2016-04-25T17:19:03Z:    15   2016-05-11T00:00:00Z: 4474  
+##  (Other)             :110402   (Other)             :83235  
+##       Age         Neighbourhood   Scholarship Hipertension Diabetes  
+##  Min.   : -1.00   JABURI : 7717   0:99666     1:21801      0:102584  
+##  1st Qu.: 18.00   MARTIZ : 5805   1:10861     0:88726      1:  7943  
+##  Median : 37.00   RENCIA : 4431                                      
+##  Mean   : 37.09   JAENHA : 3877                                      
+##  3rd Qu.: 55.00   ITARÃ‰ : 3514                                      
+##  Max.   :115.00   CENTRO : 3334                                      
+##                   (Other):81849                                      
+##  Alcoholism Handcap    SMS_received No.show    
+##  0:107167   0:108286   0:75045      No :88208  
+##  1:  3360   1:  2042   1:35482      Yes:22319  
+##             2:   183                           
+##             3:    13                           
+##             4:     3                           
+##                                                
+## 
+\end{verbatim}
+
+\section{1.1.3. Date transformation}\label{date-transformation}
+
+Another big problem we see is the treatment of the dates of appointment
+because the format hard to interpret. This calls for a transformation of
+the variables and opens a window for the creation of new variables
+containing interesting relations with the dates.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{DYM <-}\StringTok{ }\KeywordTok{getDYM}\NormalTok{(dd}\OperatorTok{$}\NormalTok{ScheduledDay)}
+\NormalTok{dd}\OperatorTok{$}\NormalTok{SchedDay <-}\StringTok{ }\KeywordTok{as.numeric}\NormalTok{(DYM}\OperatorTok{$}\NormalTok{day)}
+\NormalTok{dd}\OperatorTok{$}\NormalTok{SchedMonth <-}\StringTok{ }\KeywordTok{as.numeric}\NormalTok{(DYM}\OperatorTok{$}\NormalTok{month)}
+\NormalTok{dd}\OperatorTok{$}\NormalTok{SchedYear <-}\StringTok{ }\KeywordTok{as.numeric}\NormalTok{(DYM}\OperatorTok{$}\NormalTok{year)}
+\KeywordTok{summary}\NormalTok{(dd)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##            PatientId      AppointmentID     Gender   
+##  822145925426128:    88   Min.   :5030230   F:71840  
+##  99637671331    :    84   1st Qu.:5640286   M:38687  
+##  26886125921145 :    70   Median :5680573            
+##  33534783483176 :    65   Mean   :5675305            
+##  258424392677   :    62   3rd Qu.:5725524            
+##  871374938638855:    62   Max.   :5790484            
+##  (Other)        :110096                              
+##                ScheduledDay                 AppointmentDay 
+##  2016-05-06T07:09:54Z:    24   2016-06-06T00:00:00Z: 4692  
+##  2016-05-06T07:09:53Z:    23   2016-05-16T00:00:00Z: 4613  
+##  2016-04-25T17:17:46Z:    22   2016-05-09T00:00:00Z: 4520  
+##  2016-04-25T17:18:27Z:    22   2016-05-30T00:00:00Z: 4514  
+##  2016-04-25T17:17:23Z:    19   2016-06-08T00:00:00Z: 4479  
+##  2016-04-25T17:19:03Z:    15   2016-05-11T00:00:00Z: 4474  
+##  (Other)             :110402   (Other)             :83235  
+##       Age         Neighbourhood   Scholarship Hipertension Diabetes  
+##  Min.   : -1.00   JABURI : 7717   0:99666     1:21801      0:102584  
+##  1st Qu.: 18.00   MARTIZ : 5805   1:10861     0:88726      1:  7943  
+##  Median : 37.00   RENCIA : 4431                                      
+##  Mean   : 37.09   JAENHA : 3877                                      
+##  3rd Qu.: 55.00   ITARÃ‰ : 3514                                      
+##  Max.   :115.00   CENTRO : 3334                                      
+##                   (Other):81849                                      
+##  Alcoholism Handcap    SMS_received No.show        SchedDay    
+##  0:107167   0:108286   0:75045      No :88208   Min.   : 1.00  
+##  1:  3360   1:  2042   1:35482      Yes:22319   1st Qu.: 6.00  
+##             2:   183                            Median :13.00  
+##             3:    13                            Mean   :14.25  
+##             4:     3                            3rd Qu.:22.00  
+##                                                 Max.   :31.00  
+##                                                                
+##    SchedMonth       SchedYear   
+##  Min.   : 1.000   Min.   :2015  
+##  1st Qu.: 4.000   1st Qu.:2016  
+##  Median : 5.000   Median :2016  
+##  Mean   : 4.824   Mean   :2016  
+##  3rd Qu.: 5.000   3rd Qu.:2016  
+##  Max.   :12.000   Max.   :2016  
+## 
+\end{verbatim}
+
+And we can do the same to the variable \(\texttt{AppointmentDay}\).
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{DYM <-}\StringTok{ }\KeywordTok{getDYM}\NormalTok{(dd}\OperatorTok{$}\NormalTok{AppointmentDay)}
+
+\NormalTok{dd}\OperatorTok{$}\NormalTok{AppointDay <-}\StringTok{ }\KeywordTok{as.numeric}\NormalTok{(DYM}\OperatorTok{$}\NormalTok{day)}
+\NormalTok{dd}\OperatorTok{$}\NormalTok{AppointMonth <-}\StringTok{ }\KeywordTok{as.numeric}\NormalTok{(DYM}\OperatorTok{$}\NormalTok{month)}
+\NormalTok{dd}\OperatorTok{$}\NormalTok{AppointYear <-}\StringTok{ }\KeywordTok{as.numeric}\NormalTok{(DYM}\OperatorTok{$}\NormalTok{year)}
+
+\KeywordTok{summary}\NormalTok{(dd)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##            PatientId      AppointmentID     Gender   
+##  822145925426128:    88   Min.   :5030230   F:71840  
+##  99637671331    :    84   1st Qu.:5640286   M:38687  
+##  26886125921145 :    70   Median :5680573            
+##  33534783483176 :    65   Mean   :5675305            
+##  258424392677   :    62   3rd Qu.:5725524            
+##  871374938638855:    62   Max.   :5790484            
+##  (Other)        :110096                              
+##                ScheduledDay                 AppointmentDay 
+##  2016-05-06T07:09:54Z:    24   2016-06-06T00:00:00Z: 4692  
+##  2016-05-06T07:09:53Z:    23   2016-05-16T00:00:00Z: 4613  
+##  2016-04-25T17:17:46Z:    22   2016-05-09T00:00:00Z: 4520  
+##  2016-04-25T17:18:27Z:    22   2016-05-30T00:00:00Z: 4514  
+##  2016-04-25T17:17:23Z:    19   2016-06-08T00:00:00Z: 4479  
+##  2016-04-25T17:19:03Z:    15   2016-05-11T00:00:00Z: 4474  
+##  (Other)             :110402   (Other)             :83235  
+##       Age         Neighbourhood   Scholarship Hipertension Diabetes  
+##  Min.   : -1.00   JABURI : 7717   0:99666     1:21801      0:102584  
+##  1st Qu.: 18.00   MARTIZ : 5805   1:10861     0:88726      1:  7943  
+##  Median : 37.00   RENCIA : 4431                                      
+##  Mean   : 37.09   JAENHA : 3877                                      
+##  3rd Qu.: 55.00   ITARÃ‰ : 3514                                      
+##  Max.   :115.00   CENTRO : 3334                                      
+##                   (Other):81849                                      
+##  Alcoholism Handcap    SMS_received No.show        SchedDay    
+##  0:107167   0:108286   0:75045      No :88208   Min.   : 1.00  
+##  1:  3360   1:  2042   1:35482      Yes:22319   1st Qu.: 6.00  
+##             2:   183                            Median :13.00  
+##             3:    13                            Mean   :14.25  
+##             4:     3                            3rd Qu.:22.00  
+##                                                 Max.   :31.00  
+##                                                                
+##    SchedMonth       SchedYear      AppointDay    AppointMonth 
+##  Min.   : 1.000   Min.   :2015   Min.   : 1.0   Min.   :4.00  
+##  1st Qu.: 4.000   1st Qu.:2016   1st Qu.: 5.0   1st Qu.:5.00  
+##  Median : 5.000   Median :2016   Median :10.0   Median :5.00  
+##  Mean   : 4.824   Mean   :2016   Mean   :12.5   Mean   :5.21  
+##  3rd Qu.: 5.000   3rd Qu.:2016   3rd Qu.:19.0   3rd Qu.:5.00  
+##  Max.   :12.000   Max.   :2016   Max.   :31.0   Max.   :6.00  
+##                                                               
+##   AppointYear  
+##  Min.   :2016  
+##  1st Qu.:2016  
+##  Median :2016  
+##  Mean   :2016  
+##  3rd Qu.:2016  
+##  Max.   :2016  
+## 
+\end{verbatim}
+
+Since the old variables are of no use no more, we can choose to erase
+them.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{dd}\OperatorTok{$}\NormalTok{ScheduledDay <-}\StringTok{ }\OtherTok{NULL}
+\NormalTok{dd}\OperatorTok{$}\NormalTok{AppointmentDay <-}\StringTok{ }\OtherTok{NULL}
+\KeywordTok{summary}\NormalTok{(dd)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##            PatientId      AppointmentID     Gender         Age        
+##  822145925426128:    88   Min.   :5030230   F:71840   Min.   : -1.00  
+##  99637671331    :    84   1st Qu.:5640286   M:38687   1st Qu.: 18.00  
+##  26886125921145 :    70   Median :5680573             Median : 37.00  
+##  33534783483176 :    65   Mean   :5675305             Mean   : 37.09  
+##  258424392677   :    62   3rd Qu.:5725524             3rd Qu.: 55.00  
+##  871374938638855:    62   Max.   :5790484             Max.   :115.00  
+##  (Other)        :110096                                               
+##  Neighbourhood   Scholarship Hipertension Diabetes   Alcoholism Handcap   
+##  JABURI : 7717   0:99666     1:21801      0:102584   0:107167   0:108286  
+##  MARTIZ : 5805   1:10861     0:88726      1:  7943   1:  3360   1:  2042  
+##  RENCIA : 4431                                                  2:   183  
+##  JAENHA : 3877                                                  3:    13  
+##  ITARÃ‰ : 3514                                                  4:     3  
+##  CENTRO : 3334                                                            
+##  (Other):81849                                                            
+##  SMS_received No.show        SchedDay       SchedMonth       SchedYear   
+##  0:75045      No :88208   Min.   : 1.00   Min.   : 1.000   Min.   :2015  
+##  1:35482      Yes:22319   1st Qu.: 6.00   1st Qu.: 4.000   1st Qu.:2016  
+##                           Median :13.00   Median : 5.000   Median :2016  
+##                           Mean   :14.25   Mean   : 4.824   Mean   :2016  
+##                           3rd Qu.:22.00   3rd Qu.: 5.000   3rd Qu.:2016  
+##                           Max.   :31.00   Max.   :12.000   Max.   :2016  
+##                                                                          
+##    AppointDay    AppointMonth   AppointYear  
+##  Min.   : 1.0   Min.   :4.00   Min.   :2016  
+##  1st Qu.: 5.0   1st Qu.:5.00   1st Qu.:2016  
+##  Median :10.0   Median :5.00   Median :2016  
+##  Mean   :12.5   Mean   :5.21   Mean   :2016  
+##  3rd Qu.:19.0   3rd Qu.:5.00   3rd Qu.:2016  
+##  Max.   :31.0   Max.   :6.00   Max.   :2016  
+## 
+\end{verbatim}
+
+We can also create an interesting, although natural, variable consisting
+of the difference of days between the scheduled date and the appointment
+date.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{dd}\OperatorTok{$}\NormalTok{DateDiff <-}\StringTok{ }\KeywordTok{dateDiff}\NormalTok{(dd)}
+\KeywordTok{summary}\NormalTok{(dd)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##            PatientId      AppointmentID     Gender         Age        
+##  822145925426128:    88   Min.   :5030230   F:71840   Min.   : -1.00  
+##  99637671331    :    84   1st Qu.:5640286   M:38687   1st Qu.: 18.00  
+##  26886125921145 :    70   Median :5680573             Median : 37.00  
+##  33534783483176 :    65   Mean   :5675305             Mean   : 37.09  
+##  258424392677   :    62   3rd Qu.:5725524             3rd Qu.: 55.00  
+##  871374938638855:    62   Max.   :5790484             Max.   :115.00  
+##  (Other)        :110096                                               
+##  Neighbourhood   Scholarship Hipertension Diabetes   Alcoholism Handcap   
+##  JABURI : 7717   0:99666     1:21801      0:102584   0:107167   0:108286  
+##  MARTIZ : 5805   1:10861     0:88726      1:  7943   1:  3360   1:  2042  
+##  RENCIA : 4431                                                  2:   183  
+##  JAENHA : 3877                                                  3:    13  
+##  ITARÃ‰ : 3514                                                  4:     3  
+##  CENTRO : 3334                                                            
+##  (Other):81849                                                            
+##  SMS_received No.show        SchedDay       SchedMonth       SchedYear   
+##  0:75045      No :88208   Min.   : 1.00   Min.   : 1.000   Min.   :2015  
+##  1:35482      Yes:22319   1st Qu.: 6.00   1st Qu.: 4.000   1st Qu.:2016  
+##                           Median :13.00   Median : 5.000   Median :2016  
+##                           Mean   :14.25   Mean   : 4.824   Mean   :2016  
+##                           3rd Qu.:22.00   3rd Qu.: 5.000   3rd Qu.:2016  
+##                           Max.   :31.00   Max.   :12.000   Max.   :2016  
+##                                                                          
+##    AppointDay    AppointMonth   AppointYear      DateDiff     
+##  Min.   : 1.0   Min.   :4.00   Min.   :2016   Min.   : -6.00  
+##  1st Qu.: 5.0   1st Qu.:5.00   1st Qu.:2016   1st Qu.:  0.00  
+##  Median :10.0   Median :5.00   Median :2016   Median :  4.00  
+##  Mean   :12.5   Mean   :5.21   Mean   :2016   Mean   : 10.04  
+##  3rd Qu.:19.0   3rd Qu.:5.00   3rd Qu.:2016   3rd Qu.: 14.00  
+##  Max.   :31.0   Max.   :6.00   Max.   :2016   Max.   :181.00  
+## 
+\end{verbatim}
+
+\section{1.2 Anomaly detection}\label{anomaly-detection}
+
+We now want to erase or fix any possible anomaly that can cause
+erronious predictions. We first will assume that the variables
+\(\texttt{Gender}\), \(\texttt{Neighbourhoood}\),
+\(\texttt{Scholarship}\), \(\texttt{Hipertension}\),
+\(\texttt{Diabetes}\), \(\texttt{Alcoholism}\), \(\texttt{Handcap}\),
+\(\texttt{SMS_received}\), \(\texttt{No.show}\) do not contain any
+anomaly since they are of type factor and we have checked that the
+\(\texttt{unique}\) vector is the same as the levels we would want to
+have.
+
+\section{1.2.1 Missing values}\label{missing-values}
+
+To begin with, we will check if there are any missing values in the
+dataset. First, we look at the \(\texttt{Age}\) variable. We see that
+there is a patient that is -1 years old. We proceed to remove that
+instance.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{range}\NormalTok{(}\KeywordTok{unique}\NormalTok{(dd}\OperatorTok{$}\NormalTok{Age))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1]  -1 115
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{dd <-}\StringTok{ }\NormalTok{dd[}\OperatorTok{-}\KeywordTok{which}\NormalTok{(dd}\OperatorTok{$}\NormalTok{Age }\OperatorTok{==}\StringTok{ }\OperatorTok{-}\DecValTok{1}\NormalTok{),]}
+\KeywordTok{summary}\NormalTok{(dd)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##            PatientId      AppointmentID     Gender         Age        
+##  822145925426128:    88   Min.   :5030230   F:71839   Min.   :  0.00  
+##  99637671331    :    84   1st Qu.:5640285   M:38687   1st Qu.: 18.00  
+##  26886125921145 :    70   Median :5680572             Median : 37.00  
+##  33534783483176 :    65   Mean   :5675304             Mean   : 37.09  
+##  258424392677   :    62   3rd Qu.:5725523             3rd Qu.: 55.00  
+##  871374938638855:    62   Max.   :5790484             Max.   :115.00  
+##  (Other)        :110095                                               
+##  Neighbourhood   Scholarship Hipertension Diabetes   Alcoholism Handcap   
+##  JABURI : 7717   0:99665     1:21801      0:102583   0:107166   0:108285  
+##  MARTIZ : 5805   1:10861     0:88725      1:  7943   1:  3360   1:  2042  
+##  RENCIA : 4431                                                  2:   183  
+##  JAENHA : 3877                                                  3:    13  
+##  ITARÃ‰ : 3514                                                  4:     3  
+##  CENTRO : 3334                                                            
+##  (Other):81848                                                            
+##  SMS_received No.show        SchedDay       SchedMonth       SchedYear   
+##  0:75044      No :88207   Min.   : 1.00   Min.   : 1.000   Min.   :2015  
+##  1:35482      Yes:22319   1st Qu.: 6.00   1st Qu.: 4.000   1st Qu.:2016  
+##                           Median :13.00   Median : 5.000   Median :2016  
+##                           Mean   :14.25   Mean   : 4.824   Mean   :2016  
+##                           3rd Qu.:22.00   3rd Qu.: 5.000   3rd Qu.:2016  
+##                           Max.   :31.00   Max.   :12.000   Max.   :2016  
+##                                                                          
+##    AppointDay    AppointMonth   AppointYear      DateDiff     
+##  Min.   : 1.0   Min.   :4.00   Min.   :2016   Min.   : -6.00  
+##  1st Qu.: 5.0   1st Qu.:5.00   1st Qu.:2016   1st Qu.:  0.00  
+##  Median :10.0   Median :5.00   Median :2016   Median :  4.00  
+##  Mean   :12.5   Mean   :5.21   Mean   :2016   Mean   : 10.04  
+##  3rd Qu.:19.0   3rd Qu.:5.00   3rd Qu.:2016   3rd Qu.: 14.00  
+##  Max.   :31.0   Max.   :6.00   Max.   :2016   Max.   :181.00  
+## 
+\end{verbatim}
+
+In the documentation of the data set it is clear that the appointment
+date is always after the scheduled date but we see a minimum value of
+\(-6\) in DateDiff. Let's check these anomalies.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{dd[}\KeywordTok{which}\NormalTok{(dd}\OperatorTok{$}\NormalTok{DateDiff }\OperatorTok{<}\StringTok{ }\DecValTok{0}\NormalTok{),]}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##             PatientId AppointmentID Gender Age Neighbourhood Scholarship
+## 27034   7839272661752       5679978      M  38        RENCIA           0
+## 55227   7896293967868       5715660      F  19        SA”NIO           0
+## 64176  24252258389979       5664962      F  22        CO‡ÃƒO           0
+## 71534 998231581612122       5686628      F  81        SA”NIO           0
+## 72363   3787481966821       5655637      M   7        TAEIRO           0
+##       Hipertension Diabetes Alcoholism Handcap SMS_received No.show
+## 27034            0        0          0       1            0     Yes
+## 55227            0        0          0       1            0     Yes
+## 64176            0        0          0       0            0     Yes
+## 71534            0        0          0       0            0     Yes
+## 72363            0        0          0       0            0     Yes
+##       SchedDay SchedMonth SchedYear AppointDay AppointMonth AppointYear
+## 27034       10          5      2016          9            5        2016
+## 55227       18          5      2016         17            5        2016
+## 64176        5          5      2016          4            5        2016
+## 71534       11          5      2016          5            5        2016
+## 72363        4          5      2016          3            5        2016
+##       DateDiff
+## 27034       -1
+## 55227       -1
+## 64176       -1
+## 71534       -6
+## 72363       -1
+\end{verbatim}
+
+Other than two of these five patients being of Handcap level 1, these
+are pretty standard patients all having fled their appointment in the
+month of May 2016\ldots{} Maybe these no shows have been caused by the
+problem of the switched date. We choose to erase these instances since
+they are not representative of the general behaviour of the patients.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{dd <-}\StringTok{ }\NormalTok{dd[}\OperatorTok{-}\KeywordTok{which}\NormalTok{(dd}\OperatorTok{$}\NormalTok{DateDiff }\OperatorTok{<}\StringTok{ }\DecValTok{0}\NormalTok{),]}
+\KeywordTok{summary}\NormalTok{(dd)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##            PatientId      AppointmentID     Gender         Age        
+##  822145925426128:    88   Min.   :5030230   F:71836   Min.   :  0.00  
+##  99637671331    :    84   1st Qu.:5640284   M:38685   1st Qu.: 18.00  
+##  26886125921145 :    70   Median :5680573             Median : 37.00  
+##  33534783483176 :    65   Mean   :5675304             Mean   : 37.09  
+##  258424392677   :    62   3rd Qu.:5725524             3rd Qu.: 55.00  
+##  871374938638855:    62   Max.   :5790484             Max.   :115.00  
+##  (Other)        :110090                                               
+##  Neighbourhood   Scholarship Hipertension Diabetes   Alcoholism Handcap   
+##  JABURI : 7717   0:99660     1:21801      0:102578   0:107161   0:108282  
+##  MARTIZ : 5805   1:10861     0:88720      1:  7943   1:  3360   1:  2040  
+##  RENCIA : 4430                                                  2:   183  
+##  JAENHA : 3877                                                  3:    13  
+##  ITARÃ‰ : 3514                                                  4:     3  
+##  CENTRO : 3334                                                            
+##  (Other):81844                                                            
+##  SMS_received No.show        SchedDay       SchedMonth       SchedYear   
+##  0:75039      No :88207   Min.   : 1.00   Min.   : 1.000   Min.   :2015  
+##  1:35482      Yes:22314   1st Qu.: 6.00   1st Qu.: 4.000   1st Qu.:2016  
+##                           Median :13.00   Median : 5.000   Median :2016  
+##                           Mean   :14.25   Mean   : 4.824   Mean   :2016  
+##                           3rd Qu.:22.00   3rd Qu.: 5.000   3rd Qu.:2016  
+##                           Max.   :31.00   Max.   :12.000   Max.   :2016  
+##                                                                          
+##    AppointDay    AppointMonth   AppointYear      DateDiff     
+##  Min.   : 1.0   Min.   :4.00   Min.   :2016   Min.   :  0.00  
+##  1st Qu.: 5.0   1st Qu.:5.00   1st Qu.:2016   1st Qu.:  0.00  
+##  Median :10.0   Median :5.00   Median :2016   Median :  4.00  
+##  Mean   :12.5   Mean   :5.21   Mean   :2016   Mean   : 10.04  
+##  3rd Qu.:19.0   3rd Qu.:5.00   3rd Qu.:2016   3rd Qu.: 14.00  
+##  Max.   :31.0   Max.   :6.00   Max.   :2016   Max.   :181.00  
+## 
+\end{verbatim}
+
+\section{1.3 Deletion of irrelevant
+variables}\label{deletion-of-irrelevant-variables}
+
+We now might want to see if there are variables that don't add any
+additional information and disturb the interpretability of the model
+proposed. We will begin with the two \(\texttt{ID}\) variables.
+
+Firstly, we would want to know if patients come back to the hospital.
+That is, that there are multiple visits of patients.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{barplot}\NormalTok{(}\KeywordTok{table}\NormalTok{(dd}\OperatorTok{$}\NormalTok{PatientId), }\DataTypeTok{names.arg =} \StringTok{"Patient IDs"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{preprocessing2_files/figure-latex/unnamed-chunk-14-1.pdf}
+
+Definitely! There are patients that come back very regulary. So this
+might bring us important and personalized predictions of the patients.
+
+Unsurprisingly, the appointment ID will be unique. But we would like to
+know if its related to the date of appointment or schedule.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# DateStamp = Days + Months*30 + Years*365}
+\NormalTok{SchedStamp <-}\StringTok{ }\NormalTok{dd}\OperatorTok{$}\NormalTok{SchedDay }\OperatorTok{+}\StringTok{ }\NormalTok{dd}\OperatorTok{$}\NormalTok{SchedMonth}\OperatorTok{*}\DecValTok{30} \OperatorTok{+}\StringTok{ }\NormalTok{dd}\OperatorTok{$}\NormalTok{SchedYear}\OperatorTok{*}\DecValTok{365}
+\NormalTok{DateStamp <-}\StringTok{ }\NormalTok{dd}\OperatorTok{$}\NormalTok{AppointDay }\OperatorTok{+}\StringTok{ }\NormalTok{dd}\OperatorTok{$}\NormalTok{AppointMonth}\OperatorTok{*}\DecValTok{30} \OperatorTok{+}\StringTok{ }\NormalTok{dd}\OperatorTok{$}\NormalTok{AppointYear}\OperatorTok{*}\DecValTok{365}
+
+\NormalTok{appID <-}\StringTok{ }\KeywordTok{as.numeric}\NormalTok{(dd}\OperatorTok{$}\NormalTok{AppointmentID)}
+
+\KeywordTok{plot}\NormalTok{(appID, DateStamp)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{preprocessing2_files/figure-latex/unnamed-chunk-15-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{plot}\NormalTok{(appID, SchedStamp)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{preprocessing2_files/figure-latex/unnamed-chunk-15-2.pdf}
+
+We suspect that it is the case. We will calculate the \(R^2\) of the
+relation \(\texttt{AppointmentID}\) and \(\texttt{SchedStamp}\).
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{mod <-}\StringTok{ }\KeywordTok{glm}\NormalTok{(appID }\OperatorTok{~}\StringTok{ }\NormalTok{SchedStamp)}
+\NormalTok{Rsquared <-}\StringTok{ }\DecValTok{1} \OperatorTok{-}\StringTok{ }\NormalTok{mod}\OperatorTok{$}\NormalTok{deviance}\OperatorTok{/}\NormalTok{mod}\OperatorTok{$}\NormalTok{null.deviance}
+\KeywordTok{summary}\NormalTok{(mod)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## Call:
+## glm(formula = appID ~ SchedStamp)
+## 
+## Deviance Residuals: 
+##    Min      1Q  Median      3Q     Max  
+## -13955   -2311     482    2787   53118  
+## 
+## Coefficients:
+##               Estimate Std. Error t value Pr(>|t|)    
+## (Intercept) -2.767e+09  5.088e+05   -5437   <2e-16 ***
+## SchedStamp   3.767e+03  6.913e-01    5449   <2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## (Dispersion parameter for gaussian family taken to be 18853998)
+## 
+##     Null deviance: 5.6180e+14  on 110520  degrees of freedom
+## Residual deviance: 2.0837e+12  on 110519  degrees of freedom
+## AIC: 2165123
+## 
+## Number of Fisher Scoring iterations: 2
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{Rsquared}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 0.996291
+\end{verbatim}
+
+The \(R^2\) show that there is a very strong correlation between the two
+variables. Therefore, we will erase the \(\texttt{AppointmentID}\)
+variable for simplicity.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{dd}\OperatorTok{$}\NormalTok{AppointmentID <-}\StringTok{ }\OtherTok{NULL}
+\KeywordTok{summary}\NormalTok{(dd)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##            PatientId      Gender         Age         Neighbourhood  
+##  822145925426128:    88   F:71836   Min.   :  0.00   JABURI : 7717  
+##  99637671331    :    84   M:38685   1st Qu.: 18.00   MARTIZ : 5805  
+##  26886125921145 :    70             Median : 37.00   RENCIA : 4430  
+##  33534783483176 :    65             Mean   : 37.09   JAENHA : 3877  
+##  258424392677   :    62             3rd Qu.: 55.00   ITARÃ‰ : 3514  
+##  871374938638855:    62             Max.   :115.00   CENTRO : 3334  
+##  (Other)        :110090                              (Other):81844  
+##  Scholarship Hipertension Diabetes   Alcoholism Handcap    SMS_received
+##  0:99660     1:21801      0:102578   0:107161   0:108282   0:75039     
+##  1:10861     0:88720      1:  7943   1:  3360   1:  2040   1:35482     
+##                                                 2:   183               
+##                                                 3:    13               
+##                                                 4:     3               
+##                                                                        
+##                                                                        
+##  No.show        SchedDay       SchedMonth       SchedYear   
+##  No :88207   Min.   : 1.00   Min.   : 1.000   Min.   :2015  
+##  Yes:22314   1st Qu.: 6.00   1st Qu.: 4.000   1st Qu.:2016  
+##              Median :13.00   Median : 5.000   Median :2016  
+##              Mean   :14.25   Mean   : 4.824   Mean   :2016  
+##              3rd Qu.:22.00   3rd Qu.: 5.000   3rd Qu.:2016  
+##              Max.   :31.00   Max.   :12.000   Max.   :2016  
+##                                                             
+##    AppointDay    AppointMonth   AppointYear      DateDiff     
+##  Min.   : 1.0   Min.   :4.00   Min.   :2016   Min.   :  0.00  
+##  1st Qu.: 5.0   1st Qu.:5.00   1st Qu.:2016   1st Qu.:  0.00  
+##  Median :10.0   Median :5.00   Median :2016   Median :  4.00  
+##  Mean   :12.5   Mean   :5.21   Mean   :2016   Mean   : 10.04  
+##  3rd Qu.:19.0   3rd Qu.:5.00   3rd Qu.:2016   3rd Qu.: 14.00  
+##  Max.   :31.0   Max.   :6.00   Max.   :2016   Max.   :181.00  
+## 
+\end{verbatim}
+
+
+\end{document}

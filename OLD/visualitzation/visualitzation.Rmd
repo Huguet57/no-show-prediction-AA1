@@ -1,0 +1,319 @@
+---
+title: "Data Visualitzation"
+author: "David Anglada Rotger i Andreu Huguet Segarra"
+date: "April 26, 2019"
+output:
+  html_document:
+    df_print: paged
+---
+
+```{r}
+library(MASS)
+```
+
+### 1. Data loading
+
+We will load the processed data from the pre-processing script.
+
+```{r}
+setwd('..')
+dd <- read.csv('data.csv')
+head(dd)
+```
+
+```{r}
+dd$PatientId <- factor(dd$PatientId)
+dd$X <- NULL
+
+colnames(dd)
+head(dd)
+```
+
+### 2. Feature Extraction
+
+Analitzarem les taules de perfil fila de cada una de les variables categòriques que creiem que poden influir en el resultat de si assistirà o no. Observem primer la probabilitat *a-priori* de assistir o no assistir.
+
+```{r}
+n <- nrow(dd)
+ddNoShow <- dd[which(dd$No.show == 'NoShow'),]
+ddShow <- dd[which(dd$No.show == 'Show'),]
+
+nrow(ddNoShow)/n
+nrow(ddShow)/n
+```
+
+## 2.1 Scholarship
+
+Observem que, independentment del valor de la $\texttt{Scholarship}$, la probabilitat d'assistir és de més del 75% en els dos casos. Ara bé, la probabilitat de no assistir és més gran si es té una $\texttt{Scholarship}$ que si no en té.
+
+```{r}
+pt <- table(dd$Scholarship, dd$No.show)/n
+row_masses <- rowSums(pt)
+
+pr_Scholar <- matrix(nrow = nrow(pt), ncol = ncol(pt), dimnames = list(rownames(pt),colnames(pt)))
+for (i in 1:nrow(pt)) {
+  pr_Scholar[i,] <- c(pt[i,])/row_masses[i]
+}
+
+pr_Scholar
+```
+
+## 2.2 Hipertension
+
+Igual que abans, independentment de si el pacient té $\texttt{Hipertension}$ o no, la probabilitat d'assistir és de més del 79% en els dos casos. Ara bé, la probabilitat de no assistir és més gran si el pacient NO té $\texttt{Hipertension}$ que si en té.
+
+```{r}
+ptr <- table(dd$Hipertension, dd$No.show)/n
+
+row_massesr <- rowSums(ptr)
+
+pr_Hipertension <- matrix(nrow = nrow(ptr), ncol = ncol(ptr), dimnames = list(rownames(ptr),colnames(ptr)))
+for (i in 1:nrow(ptr)) {
+  pr_Hipertension[i,] <- c(ptr[i,])/row_massesr[i]
+}
+
+pr_Hipertension
+```
+
+## 2.3 Diabetes
+
+L'anàlisi és idèntic a l'anterior.
+
+```{r}
+ptr <- table(dd$Diabetes, dd$No.show)/n
+
+row_massesr <- rowSums(ptr)
+
+pr_Diabetes <- matrix(nrow = nrow(ptr), ncol = ncol(ptr), dimnames = list(rownames(ptr),colnames(ptr)))
+for (i in 1:nrow(ptr)) {
+  pr_Diabetes[i,] <- c(ptr[i,])/row_massesr[i]
+}
+
+pr_Diabetes
+```
+
+## 2.4 Alcoholism
+
+En aquest cas, les probabilitats són pràcticament idèntiques. Per tant, podem considerar que la variable $\texttt{Alcoholism}$ no influeix gairebé gens en si el pacient assistirà o no.
+
+```{r}
+ptr <- table(dd$Alcoholism, dd$No.show)/n
+
+row_massesr <- rowSums(ptr)
+
+pr_Alcoholism <- matrix(nrow = nrow(ptr), ncol = ncol(ptr), dimnames = list(rownames(ptr),colnames(ptr)))
+for (i in 1:nrow(ptr)) {
+  pr_Alcoholism[i,] <- c(ptr[i,])/row_massesr[i]
+}
+
+pr_Alcoholism
+```
+
+Fent un test $\chi^2$, no podem rebutjar la hipòtesi de dependència.
+
+```{r}
+chisq.test(table(dd$Alcoholism, dd$No.show))
+```
+
+## 2.5 SMS recived
+
+Sorprenentment, observem que rebre un recordatori via SMS produeix un efecte negatiu en l'assistència a la cita.
+
+```{r}
+ptr <- table(dd$SMS_received, dd$No.show)/n
+
+row_massesr <- rowSums(ptr)
+
+pr_SMS <- matrix(nrow = nrow(ptr), ncol = ncol(ptr), dimnames = list(rownames(ptr),colnames(ptr)))
+for (i in 1:nrow(ptr)) {
+  pr_SMS[i,] <- c(ptr[i,])/row_massesr[i]
+}
+
+pr_SMS
+```
+
+## 2.6 Handcap
+
+Observem que, en el cas que el pacient presenti algun tipus de $\texttt{Handcap}$, com més gran és aquest, més probable és que el pacient no assisteixi a la cita.
+
+```{r}
+ptr <- table(dd$Handcap, dd$No.show)/n
+
+row_massesr <- rowSums(ptr)
+
+pr_Handcap <- matrix(nrow = nrow(ptr), ncol = ncol(ptr), dimnames = list(rownames(ptr),colnames(ptr)))
+for (i in 1:nrow(ptr)) {
+  pr_Handcap[i,] <- c(ptr[i,])/row_massesr[i]
+}
+
+pr_Handcap
+```
+
+Llavors, potser serà interessant considerar la variable $\texttt{Handcap}$ com a numèrica en lloc de com a factor, per assegura-nos que el model té en compte que 4 és més gran que 3, 3 més que 2, etc.
+
+
+## 2.7 DateDiff
+
+Observem que, en el cas dels pacients que no han assistit, la diferència entre la data programada i la data final de la cita és considerablement més gran que la diferència entre aquestes dades en el cas dels pacients que si que han assistit.
+
+```{r}
+mean(ddNoShow$DateDiff)
+mean(ddShow$DateDiff)
+```
+
+## 2.8 Age
+
+Observem que l'edat també influeix una mica en si assisteixen o no a la cita. Com més gran és el pacient, més probabilitats d'assistir a la cita tindrà. Llavors, té sentit considerar com a numèric el valor del grup d'edat al que pertany el pacient, pel mateix motiu que la variable $\texttt{Handcap}$.
+
+```{r}
+ptr <- table(dd$Age, dd$No.show)/n
+
+row_massesr <- rowSums(ptr)
+
+pr_Age <- matrix(nrow = nrow(ptr), ncol = ncol(ptr), dimnames = list(rownames(ptr),colnames(ptr)))
+for (i in 1:nrow(ptr)) {
+  pr_Age[i,] <- c(ptr[i,])/row_massesr[i]
+}
+
+pr_Age
+```
+
+## 2.9 Gender
+
+Observem que el gènere del pacient no influeix en si assistirà o no assistirà a la cita.
+
+```{r}
+ptr <- table(dd$Gender, dd$No.show)/n
+
+row_massesr <- rowSums(ptr)
+
+pr_Gender <- matrix(nrow = nrow(ptr), ncol = ncol(ptr), dimnames = list(rownames(ptr),colnames(ptr)))
+for (i in 1:nrow(ptr)) {
+  pr_Gender[i,] <- c(ptr[i,])/row_massesr[i]
+}
+
+pr_Gender
+```
+
+
+## 2.10 Personalized feature extractions
+
+Sabem que els pacients es repeixen i, per tant, podríem extreure informació sobre si el pacient acostuma a assistir a les seves cites amb el metge o no. En els primers models no ho tindrem en compte i tractarem cada pacient nou com si no hagués vingut mai. En uns segons models, considerarem si afegir aquesta informació o no.
+
+
+### 3. Model Fit
+
+En primer lloc, anem a dividir les dades en un set de *training* i un set de *test*, que correspondran a un 67% i un 33% de les dades, respectivament. Després de l'anàlisi de les variables, utilitzarem com a *features* les $\texttt{Scholarship, Hipertension, Diabetes, DateDiff, Handcap}$ i $\texttt{Age}$. Pel que fa la variable $\texttt{Alcoholism}$ de moment també la posarem, tot i haver vist que no influeix gaire. Com hem comentat en el punt anterior, de moment no tindrem en compte l'historial d'assistència de cada un dels pacients. Crearem un nou dataset amb les variables que ens interessen.
+
+```{r}
+training <- sample(1:n, round(2*n/3))
+
+ntraining <- length(training)
+ntest <- n - nlearn
+
+X <- dd[,c(5:12, 21)]
+head(X)
+```
+
+## 3.1. Naive Bayes
+
+Provem primer de ajustar un **Naive Bayes Classifier**.
+
+```{r}
+modNB <- naiveBayes(No.show ~ ., data = X[training,])
+modNB
+```
+
+```{r}
+library(klaR)
+library(caret)
+library(e1071)
+
+modNBCV <- train(X[training,-7], X[training,]$No.show, 'nb', trControl = trainControl(method = "cv", number = 10))
+```
+
+```{r}
+modNBCV$results
+```
+
+Calculem ara l'error sobre el *training set*. Observem que s'obté un error major que les probabilitats *a-priori*, cosa que ens indica que el resultat no és massa bo. Observem també, amb la confusion matrix, que el que es fa és assignar a pràcticament tots els pacients un *Show*, cosa que explica que l'*accuracy* sigui proper al percentatge de pacients que han assistir a la cita.
+
+Observem que en el cas del model entrenat amb *cross-validation*, gairebé tots els pacients es classifiquen com a *Show*, aconseguint així una *accuracy* gairebé igual al percentatge de pacients que han assistit a la cita.
+```{r}
+pred <- predict(modNB, X[training,-7])
+predCV <- predict(modNBCV, X[training,-7])
+```
+
+```{r}
+cmNB <- table(Truth=X[training,]$No.show, Preds=pred)
+cmNB
+
+cmNBCV <- table(Truth=X[training,]$No.show, Preds=predCV)
+cmNBCV
+
+tr_accuracy <- sum(cmNB[row(cmNB)==col(cmNB)])/sum(cmNB)
+tr_accuracy
+
+tr_error <- 1 - tr_accuracy
+tr_error
+
+tr_accuracyCV <- sum(cmNBCV[row(cmNBCV)==col(cmNBCV)])/sum(cmNBCV)
+tr_accuracyCV
+
+tr_errorCV <- 1 - tr_accuracyCV
+tr_errorCV
+```
+
+Sobre el *test set*, s'obté uns valors molt semblants als anteriors i, per tant, l'anàlisi és el mateix. En el cas del model entrenat amb *cross-validation*, observem que només es classifiquen 5 pacients com a *NoShow*, és a dir, igual que abans, quasi tots es classifiquen com a *Show*.
+```{r}
+pred <- predict(modNB, newdata = X[-training,-7])
+predCV <- predict(modNBCV, X[-training,-7])
+```
+
+```{r}
+cmNB_test <- table(Truth=X[-training,]$No.show, Preds=pred)
+cmNB_test
+
+cmNBCV_test <- table(Truth=X[-training,]$No.show, Preds=predCV)
+cmNBCV_test
+
+accuracy <- sum(cmNB_test[row(cmNB_test)==col(cmNB_test)])/sum(cmNB_test)
+accuracy
+
+error <- 1 - accuracy
+error
+
+accuracyCV <- sum(cmNBCV_test[row(cmNBCV_test)==col(cmNBCV_test)])/sum(cmNBCV_test)
+accuracyCV
+
+errorCV <- 1 - accuracyCV
+errorCV
+```
+
+## Logistic Regression
+
+Donat que, en el nostre cas, es tracta de *predir* si un pacient assistirà o no, tenim que la variable *target* (la variable $\texttt{No.show}$) té una distribució de Bernoulli estem davant del cas d'un classificador binari i, per tant, té sentit considerar la **Regressió Logística** com a possible model.
+
+```{r}
+modGLM <- glm(No.show ~ ., data = X[training,], family = binomial)
+summary(modGLM)
+```
+
+
+```{r}
+source ("acm.r")
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
