@@ -5,6 +5,6 @@ neighs <- dd$Neighbourhood
 source('./feats/neighs/neighsnorm.r')
 
 dd$Neighbourhood <- neighs.norm
-dd <- dd[-(dd$Neighbourhood == "ilhas_oceanicas_trindade"),]
+dd <- dd[-which(dd$Neighbourhood == "ilhas_oceanicas_trindade"),]
 
 source('./feats/neighs/mergeinfo.r')
