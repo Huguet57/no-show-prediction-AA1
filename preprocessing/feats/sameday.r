@@ -2,19 +2,18 @@ Days <- unique(dd$AppointDay)
 Months <- unique(dd$AppointMonth)
 Locations <- unique(dd$Neighbourhood)
 
-dd$People.same.day <- rep(NA, nrow(dd))
+DML <- expand.grid(Days = Days,
+                  Months = Months,
+                  Locations = Locations)
 
-for (i.days in 1:length(Days)) {
-  for (i.months in 1:length(Months)) {
-    for (i.locations in 1:length(Locations)) {
-      
-      people.same.day <- which(dd$AppointDay == Days[i.days] &
-                                 dd$AppointMonth == Months[i.months] &
-                                 dd$Neighbourhood == Locations[i.locations])
-      
-      if (length(people.same.day) > 0) dd[people.same.day,]$People.same.day <- length(people.same.day)
-      # TODO: Can we do something with AppointmentID? It is ordered by time (?)
-      
-    }
-  }
+dd$People.same.day <- rep(NA, nrow(dd))
+N <- nrow(DML)
+
+for (i in 1:N) {
+  people.same.day <- which(dd$AppointDay == DML[i,]$Days &
+                           dd$AppointMonth == DML[i,]$Months &
+                           dd$Neighbourhood == DML[i,]$Locations)
+  
+  if (length(people.same.day) > 0) dd[people.same.day,]$People.same.day <- length(people.same.day)
+  # TODO: Can we do something with AppointmentID? It is ordered by time (?)
 }

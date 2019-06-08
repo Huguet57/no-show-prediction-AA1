@@ -3,7 +3,9 @@ dd$Prop.Noshows <- rep(NA, nrow(dd))
 dd$Hist.Noshows <- rep(NA, nrow(dd))
 dd$Hist.Scheds <- rep(NA, nrow(dd))
 
-for (i in 1:length(IDs)) {
+N <- length(IDs)
+
+for (i in 1:N) {
   people.with.id <- which(dd$PatientId == IDs[i])
   N.noshows <- sum(dd[people.with.id,]$No.show == "NoShow")
   N.scheds <- nrow(dd[people.with.id,])
