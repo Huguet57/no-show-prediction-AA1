@@ -1,3 +1,6 @@
+# colnames(barris) <- c("X", "Neighbourhood", "Area", "Population", "Men", "Women", "Renda", "Density")
+# merge(dd, barris, by = "Neighbourhood")
+
 dd$Barri.Population <- rep(NA, nrow(dd))
 dd$Barri.Area <- rep(NA, nrow(dd))
 dd$Barri.Density <- rep(NA, nrow(dd))

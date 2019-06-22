@@ -22,18 +22,27 @@ source("./norm/datenorm.r")
 dd <- dd[-which(dd$Age == -1),]
 dd <- dd[-which(dd$DateDiff < 0),]
 
-# 4. Feature extraction
-# 4.1. Patient attendance historial
+# 4. Separation of training and test data
+source("./traintest.r")
+
+# 5. Feature extraction
+# 5.1. Patient attendance historial
 source("./feats/hist.r")
 
-# 4.2. Neighbourhood socio-economic data
+dd <- rbind(dd.training.amp,
+            dd.test.amp)
+
+# 5.2. Neighbourhood socio-economic data
 source("./feats/neighs.r")
 
-# 4.3. People flow on the same location on the same date
+# 5.3. People flow on the same location on the same date
 source("./feats/sameday.r")
 
-# 5. Export processed data to file 
+summary(dd[dd$Training == 0,])
+dd <- dd[-which(dd$Barri.Population == 0),]
+
+# 6. Export processed data to file 
 write.csv(dd,
-          file = paste(DIR, 'data.csv', sep = "/"),
+          file = paste(DIR, 'data_training.csv', sep = "/"),
           fileEncoding = "UTF-8",
           row.names = FALSE)
