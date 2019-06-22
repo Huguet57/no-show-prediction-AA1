@@ -1,7 +1,8 @@
 # 1. Loading of resources
 # 1.1. Data loading
 # DIR <- 'C://Users/Administrador 2/Desktop/no-show-prediction-AA1/'
-DIR <- 'C://Users/andreu.huguet/Desktop/no-show-prediction-AA1-master/'
+# DIR <- 'C://Users/andreu.huguet/Desktop/no-show-prediction-AA1-master/'
+DIR <- '~/no-show-prediction-AA1/'
 setwd(paste(DIR, "preprocessing/", sep = ""))
 dd <- read.csv(paste(DIR, "hospital.csv", sep = ""),
                fileEncoding = 'UTF-8')
