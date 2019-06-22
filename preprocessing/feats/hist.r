@@ -12,12 +12,9 @@ system.time({
                          FUN=sum)
 })
 
-DF <- data.frame(ID = prop$Group.1,
-                 Prop.Noshows = prop$x,
-                 Hist.Noshows = hist.show$x,
+DF <- data.frame(PatientId = prop$Group.1,
+                 Prop.Shows = prop$x,
+                 Hist.Shows = hist.show$x,
                  Hist.Scheds = hist.all$x)
 
-dd <- cbind(dd[order(dd$PatientId),],
-            DF[rep(DF$ID, DF$Hist.Scheds), 2:4])
-
-dd <- dd[-is.na(dd),]
+dd <- merge(dd, DF, by = "PatientId")
