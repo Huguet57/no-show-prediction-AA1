@@ -2,7 +2,7 @@
 # 1.1. Data loading
 # DIR <- 'C://Users/Administrador 2/Desktop/no-show-prediction-AA1/'
 # DIR <- 'C://Users/andreu.huguet/Desktop/no-show-prediction-AA1-master/'
-DIR <- '~/no-show-prediction-AA1/'
+DIR <- '~/Documents/andreu/no-show-prediction-AA1/'
 setwd(paste(DIR, "preprocessing/", sep = ""))
 dd <- read.csv(paste(DIR, "hospital.csv", sep = ""),
                fileEncoding = 'UTF-8')
@@ -38,8 +38,8 @@ source("./feats/neighs.r")
 # 5.3. People flow on the same location on the same date
 source("./feats/sameday.r")
 
-summary(dd[dd$Training == 0,])
 dd <- dd[-which(dd$Barri.Population == 0),]
+summary(dd[dd$Training == 0,])
 
 # 6. Export processed data to file 
 write.csv(dd,

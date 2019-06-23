@@ -1,7 +1,8 @@
 library(FactoMineR)
 
-DIR <- '~/no-show-prediction-AA1/'
-setwd(paste(DIR, "preprocessing/", sep = ""))
+# DIR <- '~/no-show-prediction-AA1/'
+# setwd(paste(DIR, "preprocessing/", sep = ""))
+DIR <- '~/Documents/andreu/no-show-prediction-AA1/'
 dd <- read.csv(paste(DIR, "data_training.csv", sep = ""),
                fileEncoding = 'UTF-8')
 
