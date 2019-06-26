@@ -55,6 +55,7 @@ for (C in 10^seq(-3,2)) {
   {
     for (i in 1:k) 
     { 
+      cat("kCV = %d", k)
       train <- dd.full[folds!=i,] # for building the model (training)
       valid <- dd.full[folds==i,] # for prediction (validation)
       
