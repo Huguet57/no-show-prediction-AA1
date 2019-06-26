@@ -1,5 +1,5 @@
 # 1. Carreguem dades
-setwd("~/Documents/andreu/no-show-prediction-AA1/analysis")
+# setwd("~/Documents/andreu/no-show-prediction-AA1/analysis")
 dd.full <- read.csv("../data_numeric.csv",
                     fileEncoding = 'UTF-8')
 
@@ -41,19 +41,42 @@ show.training.amp <- c(show.training[ids.showups],
 
 library(e1071)
 # 6. Preparem el SVM
+
+
+# CODI DAVID. ÉS LA IDEA TREBALLADA AL LAB. CV per trobar C i gamma òptims
+
+k <- 10 
+folds <- sample(rep(1:k, length=N), N, replace=FALSE) 
+
+valid.error <- rep(0,k)
+
 for (C in 10^seq(-3,2)) {
-  (svm.out <- svm(dd.training[1:2000,],
-                  show.training[1:2000],
-                  kernel = "radial",
-                  probability = TRUE,
-                  class_weight = 'balanced', # penalize
-                  cost = C))
-  
-  pred <- predict(svm.out,
-                  newdata = dd.test,
-                  type = "response")
- 
-  (conf.table <- table(show.test, pred > 0))
-  print(G)
-  print(sum(diag(conf.table))/sum(conf.table))
+  for (g in 2^seq(-3,4))
+  {
+    for (i in 1:k) 
+    { 
+      train <- dd.full[folds!=i,] # for building the model (training)
+      valid <- dd.full[folds==i,] # for prediction (validation)
+      
+      x_train <- train[, -c(2, 4, 12)]
+      t_train <- train[, 4]
+      
+      (svm.out <- svm(x_train,
+                      t_train,
+                      kernel = "radial",
+                      probability = TRUE,
+                      class_weight = 'balanced', # penalize
+                      cost = C,
+                      gamma = g))
+      
+      pred <- predict(svm.out,
+                      newdata = dd.full,
+                      type = "response")
+      
+      conf.table <- table(show.test, pred > 0)
+      valid.error[i] <- sum(diag(conf.table))/sum(conf.table)
+    }
+    val.error <- 100*sum(valid.error)/length(valid.error)
+    cat("C = %d, Gamma = %d, Validation Error = %d\n", C, g, val.error)
+  }
 }
