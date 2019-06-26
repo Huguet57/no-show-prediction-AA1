@@ -50,12 +50,12 @@ folds <- sample(rep(1:k, length=N), N, replace=FALSE)
 
 valid.error <- rep(0,k)
 
-for (C in 10^seq(-3,2)) {
-  for (g in 2^seq(-3,4))
+#for (C in 10^seq(-3,2)) {
+  for (g in 2^seq(-2,2))
   {
     for (i in 1:k) 
     { 
-      cat("kCV = %d", k)
+      cat("kCV = %d", i)
       train <- dd.full[folds!=i,] # for building the model (training)
       valid <- dd.full[folds==i,] # for prediction (validation)
       
@@ -80,4 +80,4 @@ for (C in 10^seq(-3,2)) {
     val.error <- 100*sum(valid.error)/length(valid.error)
     cat("C = %d, Gamma = %d, Validation Error = %d\n", C, g, val.error)
   }
-}
+#}
