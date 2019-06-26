@@ -50,9 +50,8 @@ folds <- sample(rep(1:k, length=N), N, replace=FALSE)
 
 valid.error <- rep(0,k)
 
-#for (C in 10^seq(-3,2)) {
-  for (g in 2^seq(-2,2))
-  {
+for (C in 10^seq(-3,2)) {
+  for (g in 2^seq(-2,2)) {
     for (i in 1:k) 
     { 
       cat("kCV = %d", i)
@@ -62,8 +61,8 @@ valid.error <- rep(0,k)
       x_train <- train[, -c(2, 4, 12)]
       t_train <- train[, 4]
       
-      (svm.out <- svm(x_train,
-                      t_train,
+      (svm.out <- svm(x_train[1:2000,],
+                      t_train[1:2000,],
                       kernel = "radial",
                       probability = TRUE,
                       class_weight = 'balanced', # penalize
@@ -80,4 +79,4 @@ valid.error <- rep(0,k)
     val.error <- 100*sum(valid.error)/length(valid.error)
     cat("C = %d, Gamma = %d, Validation Error = %d\n", C, g, val.error)
   }
-#}
+}
